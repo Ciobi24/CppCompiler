@@ -1,0 +1,24 @@
+int a := 2;
+
+if(a > 1){
+    int c:= a;
+    int d:= 2;
+    while(c < 10){
+        int d:= 1;
+    }
+    int ifVar := 2;
+    while(ifVar < 7){
+        int dada := 2 + d;
+    }
+}
+int f(int c){
+    int x;
+    return x;
+}
+if(a==2){
+    f(a);
+}
+begin_progr
+a:=4;
+bool k:=true;
+end_progr
