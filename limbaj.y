@@ -41,6 +41,7 @@ ObjectTable all_obj_class;
 vector<IdInfo>fields;
 vector<Function>methods;
 IdInfo ret_val;
+string obj_class;
 %}
 %start progr
 %union {
@@ -232,6 +233,7 @@ decl       : TYPE ID ASSIGN expression{
            ;
 
 assignation: ID ASSIGN expression{
+                    if(all_obj_class.getObject($1)==nullptr){
                     node* res = $3->evaluate();
                     if(res == nullptr){
                          cout << "[parser]: Error assign at assignation AST::evaluate()\n";
@@ -286,6 +288,14 @@ assignation: ID ASSIGN expression{
                     else{
                          yyerror("[ID ASSIGN EXPRESSION]: Unrecognized or incorrect type at assignation");
                          YYERROR; 
+                    }
+                    }
+                    else{
+                         if(all_obj_class.getObject($1)->class_name!=obj_class){
+                              yyerror("[parser]:Object classes are different\n");
+                              YYERROR;
+                         }
+                         obj_class="";
                     }
                }
              /* | ID ASSIGN CHR{
@@ -633,6 +643,7 @@ expression: expression "+" expression{
                     $$ = new node($1);
                }
                | ID{
+                    if(all_obj_class.getObject($1)==nullptr){
                     IdInfo*id = ids.getVar($1, currScope);
                     if(id == nullptr){
                          yyerror("[parser]: Error at getVar - id not found");
@@ -690,6 +701,9 @@ expression: expression "+" expression{
                     }
                     else{
                          cout << "[parser]: ERROR - INVALID TYPE IN EXPR FOR " << $1 << endl;
+                    }
+                    }else{
+                         obj_class=all_obj_class.getObject($1)->class_name;
                     }
                }
                | ID '[' NR ']' {

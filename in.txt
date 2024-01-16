@@ -15,4 +15,5 @@ clasa:=new hello;
 a:=j.c;
 a:=clasa.c;
 a:=j.f(2);
+h:=j;
 end_progr
