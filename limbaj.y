@@ -322,8 +322,12 @@ func_decl : TYPE ID '(' {incrementScope(); flag_func=1;} list_param ')' OPENBRK 
 }
 |  TYPE ID '(' ')' OPENBRK {incrementScope();flag_func=1;} f_declarations RETURN ret ';' CLOSEDBRK {             
      if (!functions.existsFunc($2, $1, params)) {
-          if (ret_val.type != $1) {
-               cout << "[parser]: Return type mismatch\n";
+          if(ret_val.name == "error"){
+               yyerror("[parser]: return var not found\n");
+               YYERROR;
+          }
+          else if (ret_val.type != $1) {
+               yyerror("[parser]: Return type mismatch\n");
                YYERROR;
           } else {
                functions.addFunc($1, $2, params);
@@ -361,7 +365,7 @@ func_decl : TYPE ID '(' {incrementScope(); flag_func=1;} list_param ')' OPENBRK 
           
      }
 ;
-ret: ID {if(ids.existsVar($1)){ret_val.type = ids.getVar($1, currScope)->type; ret_val.name = $1; ret_val.scopeId = currScope;}else{yyerror("[parser]: Error at ret - id not found"); YYERROR;}}
+ret: ID {if(ids.getVar($1, currScope)!=nullptr){ret_val.type = ids.getVar($1, currScope)->type; ret_val.name = $1; ret_val.scopeId = currScope;}else{ret_val.name="error";yyerror("[parser]: Error id not found"); YYERROR;}}
      | NR {ret_val.type = "int"; ret_val.value.iVal = $1;}
      | FLT {ret_val.type = "float"; ret_val.value.fVal = $1;}
      | BOO {ret_val.type = "bool"; ret_val.value.bVal = $1;}
