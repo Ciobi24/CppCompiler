@@ -127,7 +127,7 @@ decl       : TYPE ID ASSIGN expression{
                          YYERROR; 
                          }
                     }
-                    else if(res->type == exprType::CHAR){ //change this to specific rule
+                    else if(res->type == exprType::CHAR){ 
                          cout << "[parser]: Updating char value\n";
                          if(ids.updateChr($2, res->val.cVal, currScope) == -1){
                               yyerror("[parser]: error at updateChr");
@@ -181,7 +181,7 @@ decl       : TYPE ID ASSIGN expression{
                          YYERROR; 
                          }
                     }
-                    else if(res->type == exprType::CHAR){ //change this to specific rule
+                    else if(res->type == exprType::CHAR){ 
                          cout << "[parser]: Updating char value\n";
                          if(ids.updateChr($3, res->val.cVal, currScope) == -1){
                               yyerror("[parser]: error at updateChr");
@@ -328,6 +328,56 @@ assignation: ID ASSIGN expression{
                      all_obj_class.addObject($1, $4, all_obj_class.getClass($4)->fields, all_obj_class.getClass($4)->methods);
                     }
             }
+          | ID '.' ID ASSIGN expression{
+               if(!all_obj_class.existsObject($1)){
+                    yyerror("[parser]: Object does not exist\n");
+                     YYERROR;
+                }
+                else {
+                    bool ok=false;
+                for(auto f:all_obj_class.getObject($1)->fields){
+                    if(f.name==$3){
+                         ok=true;
+                    node* res = $5->evaluate();
+                    if(res == nullptr){
+                         yyerror("[parser]: Error at AST::evaluate()");
+                         YYERROR;
+                    }
+                    if(res->type == exprType::INTEGER){
+                         cout << "[parser]: Updating int value\n";
+                         all_obj_class.getObject($1)->getField($3)->value.iVal=res->val.iVal;
+                    }
+                    else if(res->type == exprType::FLOAT){
+                         cout << "[parser]: Updating float value\n";
+                         all_obj_class.getObject($1)->getField($3)->value.fVal=res->val.fVal;
+                    }
+                    else if(res->type == exprType::BOOL){
+                         cout << "[parser]: Updating bool value\n";
+                         all_obj_class.getObject($1)->getField($3)->value.bVal=res->val.bVal;
+                    }
+                    else if(res->type == exprType::CHAR){ 
+                         cout << "[parser]: Updating char value\n";
+                         all_obj_class.getObject($1)->getField($3)->value.cVal=res->val.cVal;
+                    }
+                    else if(res->type == exprType::STRING){
+                         cout << "[parser]: Updating char value\n";
+                         all_obj_class.getObject($1)->getField($3)->value.sVal=res->val.sVal;
+                    }
+                    else{
+                         cout << "[parser]: Unrecognized type at assignation\n";
+                         YYERROR;
+                    }
+                    $5->clean();
+                    res = nullptr;
+                    }
+                    break;
+                }
+                if(!ok){
+                     yyerror("[parser]: Field does not exist\n");
+                     YYERROR;
+                }
+               }
+          }
            ;
 func_decl : TYPE ID '(' {incrementScope(); flag_func=1;} list_param ')' OPENBRK f_declarations RETURN ret ';' CLOSEDBRK {
      if (!functions.existsFunc($2, $1, params)) {
@@ -549,7 +599,7 @@ expression: expression "+" expression{
                          cout << "[parser]: Found int variable in expr - generating node\n";
 
                          if(flag_func==0){
-                              $$ = new node(id->value.iVal); //?crapa
+                              $$ = new node(id->value.iVal); 
                          }else{
                               int node_val = 0;
                               $$ = new node(node_val);

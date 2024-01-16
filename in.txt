@@ -16,7 +16,7 @@ begin_progr
 a:=1;
 new hello j;
 clasa:=new hello;
-a:=j.c;
-a:=clasa.c;
-a:=a+1;
+h.c:=1;
+a:=a+h.c+1;
+j.c:=h.c;
 end_progr

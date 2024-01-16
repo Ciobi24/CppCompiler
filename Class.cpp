@@ -194,8 +194,28 @@ void ObjectTable::printObjects()
             fs << "Fields: " << endl;
             for (IdInfo id : o->fields)
             {
-                cout << id.type << " " << id.name << endl;
-                fs << id.type << " " << id.name << endl;
+                cout << id.type << " " << id.name <<"  value: ";
+                fs << id.type << " " << id.name << "  value: ";
+                if(id.type == "int"){
+                    cout<<id.value.iVal<<endl;
+                    fs<<id.value.iVal<<endl;
+                }
+                else if(id.type == "float"){
+                    cout<<id.value.fVal<<endl;
+                    fs<<id.value.fVal<<endl;
+                }
+                else if(id.type == "char"){
+                    cout<<id.value.cVal<<endl;
+                    fs<<id.value.cVal<<endl;
+                }
+                else if(id.type == "bool"){
+                    cout<<id.value.bVal<<endl;
+                    fs<<id.value.bVal<<endl;
+                }
+                else if(id.type == "string"){
+                    cout<<id.value.sVal<<endl;
+                    fs<<id.value.sVal<<endl;
+                }
             }
             cout << "Methods: " << endl;
             fs << "Methods: " << endl;
