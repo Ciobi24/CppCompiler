@@ -1,4 +1,15 @@
 #include "Class.h"
+IdInfo *Object::getField(const char *name)
+{
+    for (IdInfo &id : fields)
+    {
+        if (id.name == name)
+        {
+            return &id;
+        }
+    }
+    return nullptr;
+}
 bool ObjectTable::existsClass(const char *name)
 {
     for (const Class *c : classes)

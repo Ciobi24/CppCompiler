@@ -12,6 +12,7 @@ string name;
 string class_name; //typeul obiectului
 vector<IdInfo> fields;
 vector<Function> methods;
+IdInfo* getField(const char* name);
 };
 
 class Class{

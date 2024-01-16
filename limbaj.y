@@ -41,7 +41,6 @@ ObjectTable all_obj_class;
 vector<IdInfo>fields;
 vector<Function>methods;
 IdInfo ret_val;
-string obj_class;
 %}
 %start progr
 %union {
@@ -289,14 +288,11 @@ assignation: ID ASSIGN expression{
                          yyerror("[ID ASSIGN EXPRESSION]: Unrecognized or incorrect type at assignation");
                          YYERROR; 
                     }
-                    }
-                    else{
-                         if(all_obj_class.getObject($1)->class_name!=obj_class){
-                              yyerror("[parser]:Object classes are different\n");
-                              YYERROR;
-                         }
-                         obj_class="";
-                    }
+               }
+               else{
+                    yyerror("[parser]: Objects doesn't implement copy constructor");
+                    YYERROR;
+               }
                }
              /* | ID ASSIGN CHR{
                          cout << "[parser]: assignation - Updating char value\n";
@@ -319,106 +315,6 @@ assignation: ID ASSIGN expression{
                     }
                     dimensionContainer.clear();
                }
-          | ID ASSIGN ID '.' ID {
-               if(ids.getVar($1,currScope)==nullptr){
-                    yyerror("[parser]: Error at assignation - id not found");
-                    YYERROR;
-               }
-               else{
-                    if(!all_obj_class.existsObject($3)){
-                     yyerror("[parser]: Object does not exist\n");
-                     YYERROR;
-                     }
-                    else {
-                     bool ok=false;
-                      for(auto f:all_obj_class.getObject($3)->fields){
-                            if(f.name == $5){
-                               ok=true;
-                               if(f.type != ids.getVar($1,currScope)->type){
-                                    yyerror("[parser]: Type mismatch\n");
-                                    YYERROR;
-                               }
-                               break;
-                               }
-                          }
-                     if(!ok){
-                          yyerror("[parser]: Field does not exist\n");
-                          YYERROR;
-                          }
-                     }
-
-               }
-          }
-          | ID ASSIGN ID '.' ID '(' call_list ')'{
-               if(ids.getVar($1,currScope)==nullptr){
-                    yyerror("[parser]: Error at assignation - id not found");
-                    YYERROR;
-               }
-               else{
-                    if(!all_obj_class.existsObject($3)){
-                          yyerror("[parser]: Object does not exist\n");
-                          YYERROR;
-                     }
-                     else {
-                           bool ok=false;
-                           std::vector<Function> methods = all_obj_class.getObject($3)->methods;
-                           for(auto &m : methods)
-                              {
-                              if(m.name == $5){
-                                      ok=true;  
-                                    if(m.param.size() != params.size()){
-                                          yyerror("[parser]: Wrong number of parameters\n");
-                                         YYERROR;
-                                          }
-                                         else{
-                                                for(int i=0;i<m.param.size();i++){
-                                                        if(m.param[i].type != params[i].type){
-                                                                yyerror("[parser]: Wrong parameter type\n");
-                                                               YYERROR;
-                                                               }
-                                                        }
-                                               }
-                                          break;
-                                  }
-                               }
-                          if(!ok){
-                               yyerror("[parser]: Method does not exist\n");
-                               YYERROR;
-                           } 
-                     }
-                 params.clear();
-               }
-          }
-          | ID ASSIGN ID '.' ID '(' ')'{
-               if(ids.getVar($1,currScope)==nullptr){
-                    yyerror("[parser]: Error at assignation - id not found");
-                    YYERROR;
-               }
-               else{
-                      if(!all_obj_class.existsObject($3)){
-                            yyerror("[parser]: Object does not exist\n");
-                           YYERROR;
-                          }
-                     else {
-                         bool ok=false;
-                       for(auto m:all_obj_class.getObject($3)->methods){
-                              if(m.name == $5){
-                                 ok=true;
-                                if(m.param.size() != params.size()){
-                                      yyerror("[parser]: Wrong number of parameters\n");
-                                     YYERROR;
-                                }
-                                    break;
-                               }
-                           }
-                          if(!ok){
-                               yyerror("[parser]: Method does not exist\n");
-                               YYERROR;
-                          } 
-                    }
-                    params.clear();
-               }
-          }
           | ID ASSIGN NEW ID {
                if(all_obj_class.existsObject($1)){
                     yyerror("[parser]: Object already exists\n");
@@ -702,9 +598,174 @@ expression: expression "+" expression{
                     else{
                          cout << "[parser]: ERROR - INVALID TYPE IN EXPR FOR " << $1 << endl;
                     }
-                    }else{
-                         obj_class=all_obj_class.getObject($1)->class_name;
+               }else{
+                    yyerror("[parser]: Objects doesn't implement copy constructor");
+                    YYERROR;
+               }
+               }
+               | ID '.' ID {
+                    if(!all_obj_class.existsObject($1)){
+                          yyerror("[parser]: Object does not exist\n");
+                          YYERROR;
+                     }
+                     else {
+                         Object* obj = all_obj_class.getObject($1);
+                         bool ok=false;
+                         for(auto f: obj->fields){
+                              if(f.name==$3){
+                                   ok=true;
+                                   if(f.type == string("int")){
+                                    cout << "[parser]: Found int variable in expr - generating node\n";
+                              
+                                              if(flag_func==0){
+                                                    $$ = new node(f.value.iVal);
+                                              }else{
+                                                    int node_val = 0;
+                                                    $$ = new node(node_val);
+                                              }
+                                   }
+                                   if(f.type == string("float")){
+                                        cout << "[parser]: Found float variable in expr - generating node\n";
+                                   
+                                                  if(flag_func==0){
+                                                       $$ = new node(f.value.fVal);
+                                                  }else{
+                                                       float node_val = 0;
+                                                       $$ = new node(node_val);
+                                                  }
+                                   }
+                                   if(f.type == string("bool")){
+                                        cout << "[parser]: Found bool variable in expr - generating node\n";
+                                   
+                                                  if(flag_func==0){
+                                                       $$ = new node(f.value.bVal);
+                                                  }else{
+                                                       bool node_val = false;
+                                                       $$ = new node(node_val);
+                                                  }
+                                   }
+                                   if(f.type==string("char")){
+                                        cout << "[parser]: Found char variable in expr - generating node\n";
+                                   
+                                                  if(flag_func==0){
+                                                       $$ = new node(f.value.cVal);
+                                                  }else{
+                                                       char node_val = '\0';
+                                                       $$ = new node(node_val);
+                                                  }
+                                   }
+                                   if(f.type == string("string")){
+                                        cout << "[parser]: Found string variable in expr - generating node\n";
+                                   
+                                                  if(flag_func==0){
+                                                       $$ = new node(f.value.sVal);
+                                                  }else{
+                                                       char* node_val = NULL;
+                                                       $$ = new node(node_val);
+                                                  }
+                                   }
+                                    break;
+                               }      
+                         }
+                         if(!ok){
+                              yyerror("[parser]: Field does not exist\n");
+                              YYERROR;
+                              }
+                     }
+               }
+               | ID '.' ID '(' call_list ')'{
+                    if(!all_obj_class.existsObject($1)){
+                          yyerror("[parser]: Object does not exist\n");
+                          YYERROR;
+                     }
+                     else {
+                           bool ok=false;
+                           std::vector<Function> methods = all_obj_class.getObject($1)->methods;
+                           for(auto &m : methods)
+                              {
+                              if(m.name == $3){
+                                      ok=true;  
+                                    if(m.param.size() != params.size()){
+                                          yyerror("[parser]: Wrong number of parameters\n");
+                                         YYERROR;
+                                          }
+                                   else{
+                                                for(int i=0;i<m.param.size();i++){
+                                                        if(m.param[i].type != params[i].type){
+                                                                yyerror("[parser]: Wrong parameter type\n");
+                                                               YYERROR;
+                                                               }
+                                                        }
+                                               }
+                                   if(m.type == string("int")){
+                                         cout << "[parser]: expr functions has type int\n";
+                                         int node_val = 0;
+                                         $$ = new node(node_val);
+                                   }
+                                   else if(m.type == string("float")){
+                                         cout << "[parser]: expr functions has type float\n";
+                                        float node_val = 0;
+                                        $$ = new node(node_val);
+                                    }
+                                    else if(m.type == string("bool")){
+                                          cout << "[parser]: expr functions has type bool\n";
+                                         bool node_val = false;
+                                         $$ = new node(node_val);
+                                    }else{
+                                         yyerror("[parser]: prohibited function value used in expression\n");
+                                        YYERROR;
+                                    }
+                                          break;
+                                  }
+                               }
+                          if(!ok){
+                               yyerror("[parser]: Method does not exist\n");
+                               YYERROR;
+                           } 
+                     }
+                 params.clear();
+               }
+               | ID '.' ID '(' ')'{
+                    if(!all_obj_class.existsObject($1)){
+                          yyerror("[parser]: Object does not exist\n");
+                          YYERROR;
+                     }
+                     else {
+                         bool ok=false;
+                       for(auto m:all_obj_class.getObject($1)->methods){
+                              if(m.name == $3){
+                                 ok=true;
+                                if(m.param.size() != params.size()){
+                                      yyerror("[parser]: Wrong number of parameters\n");
+                                     YYERROR;
+                                }
+                                if(m.type == string("int")){
+                                         cout << "[parser]: expr functions has type int\n";
+                                         int node_val = 0;
+                                         $$ = new node(node_val);
+                                   }
+                                   else if(m.type == string("float")){
+                                         cout << "[parser]: expr functions has type float\n";
+                                        float node_val = 0;
+                                        $$ = new node(node_val);
+                                    }
+                                    else if(m.type == string("bool")){
+                                          cout << "[parser]: expr functions has type bool\n";
+                                         bool node_val = false;
+                                         $$ = new node(node_val);
+                                    }else{
+                                         yyerror("[parser]: prohibited function value used in expression\n");
+                                        YYERROR;
+                                    }
+                                    break;
+                               }
+                           }
+                          if(!ok){
+                               yyerror("[parser]: Method does not exist\n");
+                               YYERROR;
+                          } 
                     }
+                    params.clear();
                }
                | ID '[' NR ']' {
                          IdInfo*id = ids.getUArrElemByIndex($1, currScope, $3);

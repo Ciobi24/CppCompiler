@@ -6,6 +6,10 @@ class hello{
         return o;
     };
 };
+int g(int z){
+    z:=1;
+    return z;
+}
 new hello h;
 h.f(a);
 begin_progr
@@ -14,6 +18,5 @@ new hello j;
 clasa:=new hello;
 a:=j.c;
 a:=clasa.c;
-a:=j.f(2);
-h:=j;
+a:=a+1;
 end_progr
