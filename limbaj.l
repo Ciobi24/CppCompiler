@@ -17,6 +17,8 @@
 "for" {return FOR;}
 "return" {return RETURN;}
 "void" {return VOID;}
+"class" {return CLASS;}
+"new" {return NEW;}
 \+ {return PLU;}
 \- {return MIN;}
 \* {return TIM;}

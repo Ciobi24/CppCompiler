@@ -35,23 +35,23 @@ bool IdList::existsVar(const char* var) { //add scope checking
 IdInfo *IdList::getVar(const char *name, int scope)
 {
     string strvar = string(name);
-    if(this->log_flag){
-        cout << "[getVar]: path array for " << name << " is ";
-        for(auto& elem : this->scope_path){
-            cout << elem << " ";
-        }
-        cout << endl;
-    }
+    // if(this->log_flag){
+    //     cout << "[getVar]: path array for " << name << " is ";
+    //     for(auto& elem : this->scope_path){
+    //         cout << elem << " ";
+    //     }
+    //     cout << endl;
+    // }
     IdInfo*res = nullptr;
     for(auto scope_elem = (this->scope_path).rbegin(); scope_elem != (this->scope_path).rend(); scope_elem++){
-        if(this->log_flag){
-            cout << "[getVar]: searching in scope " << *scope_elem << endl;
-        }
+        // if(this->log_flag){
+        //     cout << "[getVar]: searching in scope " << *scope_elem << endl;
+        // }
         for (IdInfo* v : vars) {
             if (strvar == v->name && v->scopeId == *scope_elem) { 
-                if(this->log_flag){
-                    cout << "[getVar]: found variable in scope " << *scope_elem << endl;
-                }
+                // if(this->log_flag){
+                //     cout << "[getVar]: found variable in scope " << *scope_elem << endl;
+                // }
                 return v;
             }
         }

@@ -34,18 +34,18 @@ return false;
 
 Function* FunctionTable::getFunc(const char* name,const vector<IdInfo> parameters) {
 for (Function* f : functions) {
-if (f->name == name && f->param.size() == parameters.size()) {
-bool match = true;
-for (size_t i = 0; i < parameters.size(); ++i) {
-if (f->param[i].type != parameters[i].type) {
-match = false;
-break;
-}
-}
-if (match) {
-return f;
-}
-}
+    if (f->name == name && f->param.size() == parameters.size()) {
+        bool match = true;
+        for (size_t i = 0; i < parameters.size(); ++i) {
+            if (f->param[i].type != parameters[i].type) {
+                match = false;
+                break;
+            }
+        }
+        if (match) {
+            return f;
+        }
+    }
 }
 return nullptr;
 }

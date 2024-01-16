@@ -1,24 +1,65 @@
-int a := 2;
+int a;
+int b;
+int e[2][2];
+int c := 2;
+string f := "mama";
+int add := 2+3+4/3;
+int mul := 2+5*4;
+int mama := mul;
+bool tata := (2+3) < 6;
+float floattest := 2.43;
+bool booltest := true;
+booltest := false;
+int inttest := 13 + c;
+int res := (mama - inttest) * 2 + add;
+int d[3][4][5];
+bool dino := (1+5) <= (2*3/4);
+bool dyzo := dino != true;
+bool zydo := !(5<4);
+int mamama := -241 + 5;
+float tatata := -22.24;
 
-if(a > 1){
-    int c:= a;
-    int d:= 2;
-    while(c < 10){
-        int d:= 1;
+int testFunc(int a) { 
+    bool funcVar := true; 
+    int mama := 2;
+    int dada := 15/2;
+    int papa :=-12;
+    float fvec[3][2];
+    fvec[0][1] := 2.244;
+    int mamamamam := 52;
+    return 52;
+}
+
+bool hahahahahhaha := !!!false;
+
+if(hahahahahhaha == false){
+    int doi := 2;
+    if(doi == 2){
+        float patrusdoi := 42.5;
     }
-    int ifVar := 2;
-    while(ifVar < 7){
-        int dada := 2 + d;
+}else if(hahahahahhaha != false){
+    int trei := 3;
+    int a[2][2];
+    a[1][1] := 14;
+}
+else{
+    int patru := 4;
+}
+
+while((mama + 2) < 24){
+    tata := false;
+    if(!tata != false){
+        tata := !!tata;
     }
 }
-int f(int c){
-    int x;
-    return x;
+
+for(int fortest:=1 ; mama < 5 ; fortest := fortest + 1 ){
+    int beta := 22;
+    if(beta <= 24){
+        beta := 24;
+    }
 }
-if(a==2){
-    f(a);
-}
+
 begin_progr
-a:=4;
-bool k:=true;
+testFunc(12);
 end_progr
