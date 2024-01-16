@@ -3,10 +3,13 @@ class hello{
     int c;
     int f(int x){
         int o;
-        return o;
+        return x;
     };
 };
 new hello h;
+h.f(a);
 begin_progr
 a:=1;
+new hello j;
+j.c;
 end_progr

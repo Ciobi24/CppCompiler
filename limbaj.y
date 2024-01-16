@@ -92,6 +92,8 @@ declarations :  decl ';'
            |declarations objects ';'
            |class_decl
            |declarations class_decl
+           | obj_field ';'
+           | declarations obj_field ';'
 	      ;
 decl       : TYPE ID ASSIGN expression{
                     if(-1 == (ids.addVar($1, $2, currScope, false, false))){
@@ -389,6 +391,10 @@ f_declarations: decl ';'
            |  f_declarations control_statement
            | call_function ';'
            | f_declarations call_function ';'
+           | objects ';'
+           | f_declarations objects ';'
+           | obj_field ';'
+           | f_declarations obj_field ';'
 	      ;
 
 control_statement : condition_statement
@@ -867,6 +873,8 @@ statement: decl ';'
          | control_statement
          | eval_stmt ';'
          | typeOf_stmt ';'
+         | objects ';'
+         | obj_field ';'
          ;
 call_function:  ID '(' call_list ')' {if(!functions.existsFuncCall($1, params)){
                               yyerror("[parser]: Function does not exist\n");
@@ -1199,7 +1207,82 @@ methods: TYPE ID '(' {incrementScope(); flag_func=1;} list_param ')' OPENBRK f_d
           
      }
 ;
-
+obj_field: ID '.' ID {
+     if(!all_obj_class.existsObject($1)){
+          yyerror("[parser]: Object does not exist\n");
+          YYERROR;
+     }
+     else {
+          bool ok=false;
+          for(auto f:all_obj_class.getObject($1)->fields){
+               if(f.name == $3){
+                    ok=true;
+                    break;
+               }
+          }
+          if(!ok){
+          yyerror("[parser]: Field does not exist\n");
+          YYERROR;
+          }    
+     }
+}
+| ID '.' ID '(' call_list ')' {
+     if(!all_obj_class.existsObject($1)){
+          yyerror("[parser]: Object does not exist\n");
+          YYERROR;
+     }
+     else {
+          bool ok=false;
+          for(auto m:all_obj_class.getObject($1)->methods){
+               if(m.name == $3){
+                    ok=true;  
+                    if(m.param.size() != params.size()){
+                         yyerror("[parser]: Wrong number of parameters\n");
+                         YYERROR;
+                    }
+                    else{
+                         for(int i=0;i<m.param.size();i++){
+                              if(m.param[i].type != params[i].type){
+                                   yyerror("[parser]: Wrong parameter type\n");
+                                   YYERROR;
+                              }
+                         }
+                    }
+                    break;
+               }
+          }
+          if(!ok){
+          yyerror("[parser]: Method does not exist\n");
+          YYERROR;
+          } 
+     }
+     params.clear();
+}
+| ID '.' ID '(' ')'{
+     if(!all_obj_class.existsObject($1)){
+          yyerror("[parser]: Object does not exist\n");
+          YYERROR;
+     }
+     else {
+          bool ok=false;
+          for(auto m:all_obj_class.getObject($1)->methods){
+               if(m.name == $3){
+                    ok=true;
+                    if(m.param.size() != params.size()){
+                         yyerror("[parser]: Wrong number of parameters\n");
+                         YYERROR;
+                    }
+                    break;
+               }
+          }
+          if(!ok){
+          yyerror("[parser]: Method does not exist\n");
+          YYERROR;
+          } 
+     }
+     params.clear();
+}
+;
 %%
 void yyerror(const char * s){
 printf("-ERROR-: %s at line:%d\n",s,yylineno);

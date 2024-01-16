@@ -18,3 +18,9 @@ Fields:
 int c
 Methods: 
 int f (int x)
+
+Object: j of class hello
+Fields: 
+int c
+Methods: 
+int f (int x)
