@@ -309,6 +309,119 @@ assignation: ID ASSIGN expression{
                     }
                     dimensionContainer.clear();
                }
+          | ID ASSIGN ID '.' ID {
+               if(ids.getVar($1,currScope)==nullptr){
+                    yyerror("[parser]: Error at assignation - id not found");
+                    YYERROR;
+               }
+               else{
+                    if(!all_obj_class.existsObject($3)){
+                     yyerror("[parser]: Object does not exist\n");
+                     YYERROR;
+                     }
+                    else {
+                     bool ok=false;
+                      for(auto f:all_obj_class.getObject($3)->fields){
+                            if(f.name == $5){
+                               ok=true;
+                               if(f.type != ids.getVar($1,currScope)->type){
+                                    yyerror("[parser]: Type mismatch\n");
+                                    YYERROR;
+                               }
+                               break;
+                               }
+                          }
+                     if(!ok){
+                          yyerror("[parser]: Field does not exist\n");
+                          YYERROR;
+                          }
+                     }
+
+               }
+          }
+          | ID ASSIGN ID '.' ID '(' call_list ')'{
+               if(ids.getVar($1,currScope)==nullptr){
+                    yyerror("[parser]: Error at assignation - id not found");
+                    YYERROR;
+               }
+               else{
+                    if(!all_obj_class.existsObject($3)){
+                          yyerror("[parser]: Object does not exist\n");
+                          YYERROR;
+                     }
+                     else {
+                           bool ok=false;
+                           std::vector<Function> methods = all_obj_class.getObject($3)->methods;
+                           for(auto &m : methods)
+                              {
+                              if(m.name == $5){
+                                      ok=true;  
+                                    if(m.param.size() != params.size()){
+                                          yyerror("[parser]: Wrong number of parameters\n");
+                                         YYERROR;
+                                          }
+                                         else{
+                                                for(int i=0;i<m.param.size();i++){
+                                                        if(m.param[i].type != params[i].type){
+                                                                yyerror("[parser]: Wrong parameter type\n");
+                                                               YYERROR;
+                                                               }
+                                                        }
+                                               }
+                                          break;
+                                  }
+                               }
+                          if(!ok){
+                               yyerror("[parser]: Method does not exist\n");
+                               YYERROR;
+                           } 
+                     }
+                 params.clear();
+               }
+          }
+          | ID ASSIGN ID '.' ID '(' ')'{
+               if(ids.getVar($1,currScope)==nullptr){
+                    yyerror("[parser]: Error at assignation - id not found");
+                    YYERROR;
+               }
+               else{
+                      if(!all_obj_class.existsObject($3)){
+                            yyerror("[parser]: Object does not exist\n");
+                           YYERROR;
+                          }
+                     else {
+                         bool ok=false;
+                       for(auto m:all_obj_class.getObject($3)->methods){
+                              if(m.name == $5){
+                                 ok=true;
+                                if(m.param.size() != params.size()){
+                                      yyerror("[parser]: Wrong number of parameters\n");
+                                     YYERROR;
+                                }
+                                    break;
+                               }
+                           }
+                          if(!ok){
+                               yyerror("[parser]: Method does not exist\n");
+                               YYERROR;
+                          } 
+                    }
+                    params.clear();
+               }
+          }
+          | ID ASSIGN NEW ID {
+               if(all_obj_class.existsObject($1)){
+                    yyerror("[parser]: Object already exists\n");
+                     YYERROR;
+                }
+                else if(!all_obj_class.existsClass($4)){
+                     yyerror("[parser]: Class does not exist\n");
+                     YYERROR;
+                 }
+               else{
+                     all_obj_class.addObject($1, $4, all_obj_class.getClass($4)->fields, all_obj_class.getClass($4)->methods);
+                    }
+            }
            ;
 func_decl : TYPE ID '(' {incrementScope(); flag_func=1;} list_param ')' OPENBRK f_declarations RETURN ret ';' CLOSEDBRK {
      if (!functions.existsFunc($2, $1, params)) {

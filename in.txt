@@ -1,9 +1,9 @@
 int a;
 class hello{
     int c;
-    int f(int x){
+    int f(int p){
         int o;
-        return x;
+        return o;
     };
 };
 new hello h;
@@ -11,5 +11,8 @@ h.f(a);
 begin_progr
 a:=1;
 new hello j;
-j.c;
+clasa:=new hello;
+a:=j.c;
+a:=clasa.c;
+a:=j.f(2);
 end_progr
