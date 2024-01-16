@@ -1,5 +1,4 @@
 #include "Class.h"
-
 bool ObjectTable::existsClass(const char *name)
 {
     for (const Class *c : classes)
@@ -54,22 +53,22 @@ int ObjectTable::addClass(const char *name, vector<IdInfo> fields, vector<Functi
     c->name = string(name);
     for (auto field : fields)
     {
-        IdInfo *id = new IdInfo;
-        id->type = field.type;
-        id->name = field.name;
-        id->scopeId = 0;
-        id->isConst = field.isConst;
-        id->isArr = field.isArr;
-        id->dimensions = field.dimensions;
-        id->arrVal = field.arrVal;
+        IdInfo id ;
+        id.type = field.type;
+        id.name = field.name;
+        id.scopeId = 0;
+        id.isConst = field.isConst;
+        id.isArr = field.isArr;
+        id.dimensions = field.dimensions;
+        id.arrVal = field.arrVal;
         c->fields.push_back(id);
     }
     for (auto method : methods)
     {
-        Function *f = new Function;
-        f->type = method.type;
-        f->name = method.name;
-        f->param = method.param;
+        Function f;
+        f.type = method.type;
+        f.name = method.name;
+        f.param = method.param;
         c->methods.push_back(f);
     }
     classes.push_back(c);
@@ -90,22 +89,22 @@ int ObjectTable::addObject(const char *name, const char *class_name, vector<IdIn
     o->class_name = string(class_name);
     for (auto field : fields)
     {
-        IdInfo *id = new IdInfo;
-        id->type = field.type;
-        id->name = field.name;
-        id->scopeId = 0;
-        id->isConst = field.isConst;
-        id->isArr = field.isArr;
-        id->dimensions = field.dimensions;
-        id->arrVal = field.arrVal;
+        IdInfo id;
+        id.type = field.type;
+        id.name = field.name;
+        id.scopeId = 0;
+        id.isConst = field.isConst;
+        id.isArr = field.isArr;
+        id.dimensions = field.dimensions;
+        id.arrVal = field.arrVal;
         o->fields.push_back(id);
     }
     for (auto method : getClass(class_name)->methods)
     {
-        Function *f = new Function;
-        f->type = method->type;
-        f->name = method->name;
-        f->param = method->param;
+        Function f;
+        f.type = method.type;
+        f.name = method.name;
+        f.param = method.param;
         o->methods.push_back(f);
     }
     objects.push_back(o);
@@ -122,27 +121,36 @@ void ObjectTable::printClasses()
         {
             cout << "[printVars]: error at opening file\n";
         }
+        fs<<endl<<"Classes:";
         for (Class *c : classes)
         {
-            cout << "Class: " << c->name << endl;
+            cout <<"Class: " << c->name << endl;
             cout << "Fields: " << endl;
             fs << "Class: " << c->name << endl;
             fs << "Fields: " << endl;
-            for (IdInfo *id : c->fields)
+            for (IdInfo id : c->fields)
             {
-                cout << id->type << " " << id->name << endl;
-                fs << id->type << " " << id->name << endl;
+                cout << id.type << " " << id.name << endl;
+                fs << id.type << " " << id.name << endl;
             }
             cout << "Methods: " << endl;
             fs << "Methods: " << endl;
-            for (Function *f : c->methods)
+            for (Function f : c->methods)
             {
-                cout << f->type << " " << f->name << " (";
-                fs << f->type << " " << f->name << " (";
-                for (IdInfo id : f->param)
+                bool first = true;
+                cout << f.type << " " << f.name << " (";
+                fs << f.type << " " << f.name << " (";
+                for (IdInfo id : f.param)
                 {
-                    cout << id.type << " " << id.name << ", ";
-                    fs << id.type << " " << id.name << ", ";
+                    if(!first){
+                        cout << ", ";
+                        fs << ", ";
+                    }
+                    cout << id.type << " " << id.name;
+                    fs << id.type << " " << id.name;
+                    if(first){
+                    first = false;
+                    }
                 }
                 cout << ")" << endl;
                 fs << ")" << endl;
@@ -166,27 +174,36 @@ void ObjectTable::printObjects()
         {
             cout << "[printVars]: error at opening file\n";
         }
+        fs<<endl<<"Objects:";
         for (Object *o : objects)
         {
-            cout << "Object: " << o->name << " of class " << o->class_name << endl;
+            cout << endl<<"Object: " << o->name << " of class " << o->class_name << endl;
             cout << "Fields: " << endl;
-            fs << "Object: " << o->name << " of class " << o->class_name << endl;
+            fs << endl<<"Object: " << o->name << " of class " << o->class_name << endl;
             fs << "Fields: " << endl;
-            for (IdInfo *id : o->fields)
+            for (IdInfo id : o->fields)
             {
-                cout << id->type << " " << id->name << endl;
-                fs << id->type << " " << id->name << endl;
+                cout << id.type << " " << id.name << endl;
+                fs << id.type << " " << id.name << endl;
             }
             cout << "Methods: " << endl;
             fs << "Methods: " << endl;
-            for (Function *f : o->methods)
+            for (Function f : o->methods)
             {
-                cout << f->type << " " << f->name << " (";
-                fs << f->type << " " << f->name << " (";
-                for (IdInfo id : f->param)
+                bool first = true;
+                cout << f.type << " " << f.name << " (";
+                fs << f.type << " " << f.name << " (";
+                for (IdInfo id : f.param)
                 {
-                    cout << id.type << " " << id.name << ", ";
-                    fs << id.type << " " << id.name << ", ";
+                    if(!first){
+                        cout << ", ";
+                        fs << ", ";
+                    }
+                    cout << id.type << " " << id.name;
+                    fs << id.type << " " << id.name;
+                    if(first){
+                    first = false;
+                    }
                 }
                 cout << ")" << endl;
                 fs << ")" << endl;

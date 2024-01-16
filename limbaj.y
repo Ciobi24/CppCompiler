@@ -88,6 +88,10 @@ declarations :  decl ';'
            |  declarations control_statement
            | call_function ';'
            | declarations call_function ';'
+           |objects ';'
+           |declarations objects ';'
+           |class_decl
+           |declarations class_decl
 	      ;
 decl       : TYPE ID ASSIGN expression{
                     if(-1 == (ids.addVar($1, $2, currScope, false, false))){
@@ -319,6 +323,9 @@ func_decl : TYPE ID '(' {incrementScope(); flag_func=1;} list_param ')' OPENBRK 
      params.clear();
      decrementScope();
      flag_func=0;
+     ret_val.name = "";
+     ret_val.type = "";
+
 }
 |  TYPE ID '(' ')' OPENBRK {incrementScope();flag_func=1;} f_declarations RETURN ret ';' CLOSEDBRK {             
      if (!functions.existsFunc($2, $1, params)) {
@@ -339,6 +346,8 @@ func_decl : TYPE ID '(' {incrementScope(); flag_func=1;} list_param ')' OPENBRK 
      params.clear();
      decrementScope();
      flag_func=0;
+     ret_val.name = "";
+     ret_val.type = "";
      }
 | VOID ID '(' {incrementScope();flag_func=1;} list_param ')' OPENBRK f_declarations {decrementScope();}CLOSEDBRK {
        
@@ -992,175 +1001,205 @@ call_list : NR {IdInfo arg; arg.type=string("int"); arg.name=string(""); arg.val
                               YYERROR;
                          }}
            ;
-// class_decl : CLASS ID OPENBRK in_class_decl CLOSEDBRK ';' {
-//                if(!all_obj_class.existsClass($2)){
-//                     all_obj_class.addClass($2, fields, methods );
-//                }
-//                else{
-//                     yyerror("[parser]: Class already exists\n");
-//                     YYERROR;
-//                }
-//                fields.clear();
-//                methods.clear();
+class_decl : CLASS ID OPENBRK in_class_decl CLOSEDBRK ';' {
+               if(!all_obj_class.existsClass($2)){
+                    all_obj_class.addClass($2, fields, methods );
+               }
+               else{
+                    yyerror("[parser]: Class already exists\n");
+                    YYERROR;
+               }
+               fields.clear();
+               methods.clear();
                
-//      }
-//               | CLASS ID OPENBRK in_class_decl CLOSEDBRK{
-//                      if(!all_obj_class.existsClass($2)){
-//                     all_obj_class.addClass($2,fields,methods );
-//                }
-//                else{
-//                     yyerror("[parser]: Class already exists\n");
-//                     YYERROR;
-//                }
-//                fields.clear();
-//                methods.clear();
+     }
+              | CLASS ID OPENBRK in_class_decl CLOSEDBRK{
+                     if(!all_obj_class.existsClass($2)){
+                    all_obj_class.addClass($2,fields,methods );
+               }
+               else{
+                    yyerror("[parser]: Class already exists\n");
+                    YYERROR;
+               }
+               fields.clear();
+               methods.clear();
                
-//      }
-//                ;
-// in_class_decl: var_class_decl ';'
-//                |in_class_decl var_class_decl ';'
-//                ;
+     }
+               ;
+in_class_decl: var_class_decl ';'
+               |in_class_decl var_class_decl ';'
+               ;
 
-// var_class_decl: TYPE ID {
-//                     bool ok=true;
-//                   for(auto f:fields){
-//                        if(f.name == $2){
-//                          ok=false;
-//                             yyerror("[parser]: Field already exists\n");
-//                             YYERROR;
-//                        }
-//                   }
-//                   if(ok){
-//                        IdInfo field;
-//                        field.type=string($1);
-//                        field.name=string($2);
-//                        field.isArr=false;
-//                        field.isConst=false;
-//                        field.scopeId=currScope;
-//                        fields.push_back(field);
-//                   }
-//                }
-//            | CONST TYPE ID {
-//                    bool ok=true;
-//                   for(auto f:fields){
-//                        if(f.name == $2){
-//                          ok=false;
-//                             yyerror("[parser]: Field already exists\n");
-//                             YYERROR;
-//                        }
-//                   }
-//                   if(ok){
-//                        IdInfo field;
-//                        field.type=string($1);
-//                        field.name=string($2);
-//                        field.isArr=false;
-//                        field.isConst=true;
-//                        field.scopeId=currScope;
-//                        fields.push_back(field);
-//                   }
-//                     }
-//            | TYPE ID dimension{
-//                     bool ok=true;for(auto f:fields){
-//                        if(f.name == $2){
-//                          ok=false;
-//                             yyerror("[parser]: Field already exists\n");
-//                             YYERROR;
-//                        }
-//                     }
-//                     if(ok){
-//                          IdInfo field;
-//                          field.type=string($1);
-//                          field.name=string($2);
-//                          field.isArr=true;
-//                          field.isConst=false;
-//                          field.scopeId=currScope;
-//                          if(ids.setArraySize($2, dimensionContainer, currScope) == -1){
-//                               yyerror("[parser]: setArraySize error ");
-//                               YYERROR;
-//                          }
-//                          if(ids.initializeArray($2, currScope) == -1){
-//                               yyerror("[parser]: initializeArray error ");
-//                               YYERROR;
-//                          }
-//                          field.dimension=dimensionContainer;
-//                          fields.push_back(field);
-//                          dimensionContainer.clear();
-//                     }
-//                }
-//           | objects 
-//           | methods
-//                ;
+var_class_decl: TYPE ID {
+                    bool ok=true;
+                  for(auto f:fields){
+                       if(f.name == $2){
+                         ok=false;
+                            yyerror("[parser]: Field already exists\n");
+                            YYERROR;
+                       }
+                  }
+                  if(ok){
+                       IdInfo field;
+                       field.type=strdup($1);
+                       field.name=strdup($2);
+                       field.isArr=false;
+                       field.isConst=false;
+                       field.scopeId=currScope;
+                       fields.push_back(field);
+                  }
+               }
+           | CONST TYPE ID {
+                   bool ok=true;
+                  for(auto f:fields){
+                       if(f.name == $2){
+                         ok=false;
+                            yyerror("[parser]: Field already exists\n");
+                            YYERROR;
+                       }
+                  }
+                  if(ok){
+                       IdInfo field;
+                       field.type=strdup($2);
+                       field.name=strdup($3);
+                       field.isArr=false;
+                       field.isConst=true;
+                       field.scopeId=currScope;
+                       fields.push_back(field);
+                  }
+                    }
+           | TYPE ID dimension{
+                    bool ok=true;for(auto f:fields){
+                       if(f.name == $2){
+                         ok=false;
+                            yyerror("[parser]: Field already exists\n");
+                            YYERROR;
+                       }
+                    }
+                    if(ok){
+                         IdInfo field;
+                         field.type=strdup($1);
+                         field.name=strdup($2);
+                         field.isArr=true;
+                         field.isConst=false;
+                         field.scopeId=currScope;
+                         if(ids.setArraySize($2, dimensionContainer, currScope) == -1){
+                              yyerror("[parser]: setArraySize error ");
+                              YYERROR;
+                         }
+                         if(ids.initializeArray($2, currScope) == -1){
+                              yyerror("[parser]: initializeArray error ");
+                              YYERROR;
+                         }
+                         field.dimensions=dimensionContainer;
+                         fields.push_back(field);
+                         dimensionContainer.clear();
+                    }
+               }
+          | objects
+          | methods
+               ;
    
-// objects: NEW ID ID {
-//      if(all_obj_class.existsObject($3)){
-//           yyerror("[parser]: Object already exists\n");
-//           YYERROR;
-//      }
-//      else if(!all_obj_class.existsClass($2)){
-//           yyerror("[parser]: Class does not exist\n");
-//           YYERROR;
-//      }
-//      else{
-//           all_obj_class.addObject($3, $2, getClass($2)->fields, getClass($2)->methods);
-//      }
-// }
-// methods: TYPE ID '(' {incrementScope(); flag_func=1;} list_param ')' OPENBRK declarations RETURN ID ';' CLOSEDBRK {
-//      if (!functions.existsFunc($2, $1, params)) {
-//           if (ids.getVar($10, currScope)->type != $1) {
-//                cout << "[parser]: Return type mismatch\n";
-//                YYERROR;
-//           } else {
-//                functions.addFunc($1, $2, params);
-//           }
-//      } else {
-//           cout << "[parser]: Function already exists\n";
-//           YYERROR;
-//      }
-//      params.clear();
-//      decrementScope();
-//      flag_func=0;
-// }
-// |  TYPE ID '(' ')' OPENBRK {incrementScope();flag_func=1;} declarations RETURN ID ';' CLOSEDBRK {             
-//      if (!functions.existsFunc($2, $1, params)) {
-//           if (ids.getVar($9, currScope)->type != $1) {
-//                cout << "[parser]: Return type mismatch\n";
-//                YYERROR;
-//           } else {
-//                functions.addFunc($1, $2, params);
-//           }
-//      } else {
-//           cout << "[parser]: Function already exists\n";
-//           YYERROR;
-//      }
-//      params.clear();
-//      decrementScope();
-//      flag_func=0;
-//      }
-// | VOID ID '(' {incrementScope();flag_func=1;} list_param ')' OPENBRK declarations {decrementScope();}CLOSEDBRK {
+objects: NEW ID ID {
+     if(all_obj_class.existsObject($3)){
+          yyerror("[parser]: Object already exists\n");
+          YYERROR;
+     }
+     else if(!all_obj_class.existsClass($2)){
+          yyerror("[parser]: Class does not exist\n");
+          YYERROR;
+     }
+     else{
+          all_obj_class.addObject($3, $2, all_obj_class.getClass($2)->fields, all_obj_class.getClass($2)->methods);
+     }
+}
+methods: TYPE ID '(' {incrementScope(); flag_func=1;} list_param ')' OPENBRK f_declarations RETURN ret ';' CLOSEDBRK {
+             bool ok=true;
+          for(auto m: methods){
+               if($2 == m.name){
+                    ok=false;
+                    yyerror("[parser]: Method already exists\n");
+                    YYERROR;
+               }
+          }
+          if(ok){
+               Function m;
+               m.type=string($1);
+               m.name=string($2);
+               m.param=params;
+               methods.push_back(m);
+          }
+     params.clear();
+     decrementScope();
+     flag_func=0;
+     ret_val.name = "";
+     ret_val.type = "";
+
+}
+|  TYPE ID '(' ')' OPENBRK {incrementScope();flag_func=1;} f_declarations RETURN ret ';' CLOSEDBRK {             
+              bool ok=true;
+          for(auto m: methods){
+               if($2 == m.name){
+                    ok=false;
+                    yyerror("[parser]: Method already exists\n");
+                    YYERROR;
+               }
+          }
+          if(ok){
+               Function m;
+               m.type=string($1);
+               m.name=string($2);
+               m.param=params;
+               methods.push_back(m);
+          }
+     params.clear();
+     decrementScope();
+     flag_func=0;
+     ret_val.name = "";
+     ret_val.type = "";
+     }
+| VOID ID '(' {incrementScope();flag_func=1;} list_param ')' OPENBRK f_declarations {decrementScope();}CLOSEDBRK {
        
-//      if (!functions.existsFunc($2, "void", params)) {
-//           functions.addFunc("void", $2, params);
-//           }
-//           else{
-//                cout<< "[parser]: Function already exists\n";
-//                YYERROR;
-//           }
-//           params.clear();
-//           flag_func=0;
-//      }       
-// |VOID ID '(' ')' OPENBRK {incrementScope();flag_func=1;} declarations {decrementScope();} CLOSEDBRK {
-//           if (!functions.existsFunc($2, "void", params)) {
-//                functions.addFunc("void", $2, params);
-//           }
-//           else{
-//                cout<< "[parser]: Function already exists\n";
-//                YYERROR;
-//           }
-//           flag_func=0;
-//           params.clear();
+              bool ok=true;
+          for(auto m: methods){
+               if($2 == m.name){
+                    ok=false;
+                    yyerror("[parser]: Method already exists\n");
+                    YYERROR;
+               }
+          }
+          if(ok){
+               Function m;
+               m.type=string("void");
+               m.name=string($2);
+               m.param=params;
+               methods.push_back(m);
+          }
+          params.clear();
+          flag_func=0;
+     }       
+|VOID ID '(' ')' OPENBRK {incrementScope();flag_func=1;} f_declarations {decrementScope();} CLOSEDBRK {
+         bool ok=true;
+          for(auto m: methods){
+               if($2 == m.name){
+                    ok=false;
+                    yyerror("[parser]: Method already exists\n");
+                    YYERROR;
+               }
+          }
+          if(ok){
+               Function m;
+               m.type=string("void");
+               m.name=string($2);
+               m.param=params;
+               methods.push_back(m);
+          }
+          flag_func=0;
+          params.clear();
           
-//      }
-// ;
+     }
+;
+
 %%
 void yyerror(const char * s){
 printf("-ERROR-: %s at line:%d\n",s,yylineno);
@@ -1172,9 +1211,13 @@ int main(int argc, char** argv){
      ids.log_flag = atoi(argv[2]);
      yyin=fopen(argv[1],"r");
      yyparse();
-     cout << "Variables:" <<endl;
+     cout << endl<<endl<<"Variables:" <<endl;
      ids.printVars();
-     cout<<"Functions:"<<endl;
+     cout<<endl<<endl<<"Functions:"<<endl;
      functions.printFuncs();
+     cout<<endl<<endl<<"Classes:"<<endl;
+     all_obj_class.printClasses();
+     cout<<endl<<endl<<"Objects:";
+     all_obj_class.printObjects();    
      delete temp;
 } 

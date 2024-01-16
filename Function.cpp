@@ -71,6 +71,7 @@ int FunctionTable::addFunc(const char* type, const char* name, vector<IdInfo> pa
 if(!fs){
 cout << "[printVars]: error at opening file\n";
 }
+fs<<endl<<"Functions: "<<endl;
 for (const Function* f : functions) {
 cout<<"return type: "<<f->type<<", name: "<<f->name<<", parameters: ";
 for( auto param : f->param){

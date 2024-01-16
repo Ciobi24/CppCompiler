@@ -1,0 +1,20 @@
+
+Variables: 
+name: a, type: int, scope: 0, value: 1
+name: x, type: int, scope: 1, value: 0
+name: o, type: int, scope: 1, value: 0
+
+Functions: 
+
+Classes:Class: hello
+Fields: 
+int c
+Methods: 
+int f (int x)
+
+Objects:
+Object: h of class hello
+Fields: 
+int c
+Methods: 
+int f (int x)

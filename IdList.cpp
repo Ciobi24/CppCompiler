@@ -116,6 +116,7 @@ ofstream fs(filePath);
     if(!fs){
         log("[printVars]: error at opening file\n");
     }
+    fs<<endl<<"Variables: "<<endl;
     for (const IdInfo* v : vars) {
         if(!v->isArr){
             cout << "name: " << v->name << ", type: " << v->type << ", scope: " << v->scopeId << ", value: ";

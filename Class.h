@@ -10,15 +10,15 @@ class Object{
  public:
 string name;
 string class_name; //typeul obiectului
-vector<IdInfo*> fields;
-vector<Function*> methods;
+vector<IdInfo> fields;
+vector<Function> methods;
 };
 
 class Class{
     public:
     string name;
-    vector<IdInfo*> fields;
-    vector<Function*> methods;
+    vector<IdInfo> fields;
+    vector<Function> methods;
 };
 
 class ObjectTable{
