@@ -75,23 +75,37 @@ IdInfo ret_val;
 %left TIM DVD
 %right UMINUS
 %%
-progr: declarations block {printf("The programme is correct!\n");}
-     ;
 
+progr: class_block var_block function_block block {printf("The programme is correct!\n");}
+     | var_block function_block block {printf("The programme is correct!\n");}
+     | function_block block {printf("The programme is correct!\n");}
+     | block {printf("The programme is correct!\n");}
+     | class_block var_block block {printf("The programme is correct!\n");}
+     | class_block function_block block {printf("The programme is correct!\n");}
+     | class_block block {printf("The programme is correct!\n");}
+     | var_block block {printf("The programme is correct!\n");}
+     ;
+class_block: class_decl class_block
+           | class_decl
+           ;
+function_block: func_decl function_block
+              | func_decl
+              ;
+var_block: decl ';'
+          | var_block decl ';'
+          | objects ';'
+          | var_block objects ';'
+          ;
 declarations :  decl ';'          
 	      |  declarations decl ';' 
            |  assignation ';'
            |  declarations assignation ';' 
-           |  func_decl
-           |  declarations func_decl
            |  control_statement
            |  declarations control_statement
            | call_function ';'
            | declarations call_function ';'
-           |objects ';'
+           | objects ';'
            |declarations objects ';'
-           |class_decl
-           |declarations class_decl
            | obj_field ';'
            | declarations obj_field ';'
 	      ;
@@ -335,43 +349,43 @@ assignation: ID ASSIGN expression{
                 }
                 else {
                     bool ok=false;
-                for(auto f:all_obj_class.getObject($1)->fields){
-                    if(f.name==$3){
-                         ok=true;
-                    node* res = $5->evaluate();
-                    if(res == nullptr){
-                         yyerror("[parser]: Error at AST::evaluate()");
-                         YYERROR;
-                    }
-                    if(res->type == exprType::INTEGER){
-                         cout << "[parser]: Updating int value\n";
-                         all_obj_class.getObject($1)->getField($3)->value.iVal=res->val.iVal;
-                    }
-                    else if(res->type == exprType::FLOAT){
-                         cout << "[parser]: Updating float value\n";
-                         all_obj_class.getObject($1)->getField($3)->value.fVal=res->val.fVal;
-                    }
-                    else if(res->type == exprType::BOOL){
-                         cout << "[parser]: Updating bool value\n";
-                         all_obj_class.getObject($1)->getField($3)->value.bVal=res->val.bVal;
-                    }
-                    else if(res->type == exprType::CHAR){ 
-                         cout << "[parser]: Updating char value\n";
-                         all_obj_class.getObject($1)->getField($3)->value.cVal=res->val.cVal;
-                    }
-                    else if(res->type == exprType::STRING){
-                         cout << "[parser]: Updating char value\n";
-                         all_obj_class.getObject($1)->getField($3)->value.sVal=res->val.sVal;
-                    }
-                    else{
-                         cout << "[parser]: Unrecognized type at assignation\n";
-                         YYERROR;
-                    }
-                    $5->clean();
-                    res = nullptr;
-                    }
-                    break;
-                }
+                    for(auto f:all_obj_class.getObject($1)->fields){
+                         if(f.name==$3){
+                              ok=true;
+                              node* res = $5->evaluate();
+                              if(res == nullptr){
+                                   yyerror("[parser]: Error at AST::evaluate()");
+                                   YYERROR;
+                              }
+                              if(res->type == exprType::INTEGER){
+                                   cout << "[parser]: Updating int value\n";
+                                   all_obj_class.getObject($1)->getField($3)->value.iVal=res->val.iVal;
+                              }
+                              else if(res->type == exprType::FLOAT){
+                                   cout << "[parser]: Updating float value\n";
+                                   all_obj_class.getObject($1)->getField($3)->value.fVal=res->val.fVal;
+                              }
+                              else if(res->type == exprType::BOOL){
+                                   cout << "[parser]: Updating bool value\n";
+                                   all_obj_class.getObject($1)->getField($3)->value.bVal=res->val.bVal;
+                              }
+                              else if(res->type == exprType::CHAR){ 
+                                   cout << "[parser]: Updating char value\n";
+                                   all_obj_class.getObject($1)->getField($3)->value.cVal=res->val.cVal;
+                              }
+                              else if(res->type == exprType::STRING){
+                                   cout << "[parser]: Updating char value\n";
+                                   all_obj_class.getObject($1)->getField($3)->value.sVal=res->val.sVal;
+                              }
+                              else{
+                                   cout << "[parser]: Unrecognized type at assignation\n";
+                                   YYERROR;
+                              }
+                              $5->clean();
+                              res = nullptr;
+                              break;
+                     }
+                 }
                 if(!ok){
                      yyerror("[parser]: Field does not exist\n");
                      YYERROR;
@@ -1098,6 +1112,7 @@ param: TYPE ID { ids.addVar($1,$2,currScope,false,false); IdInfo arg; arg.type=s
 
 
 block : BGIN list END  
+     | BGIN END
      ;
      
 
@@ -1329,14 +1344,7 @@ var_class_decl: TYPE ID {
                          field.isArr=true;
                          field.isConst=false;
                          field.scopeId=currScope;
-                         if(ids.setArraySize($2, dimensionContainer, currScope) == -1){
-                              yyerror("[parser]: setArraySize error ");
-                              YYERROR;
-                         }
-                         if(ids.initializeArray($2, currScope) == -1){
-                              yyerror("[parser]: initializeArray error ");
-                              YYERROR;
-                         }
+                         //initialize array,array size
                          field.dimensions=dimensionContainer;
                          fields.push_back(field);
                          dimensionContainer.clear();

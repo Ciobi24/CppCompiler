@@ -1,22 +1,65 @@
-int a;
-class hello{
-    int c;
-    int f(int p){
-        int o;
-        return o;
+class car{
+    int price;
+    bool isNew;
+    int consumption(int p){
+        int o:=2+3-4;
+        return 0;
+    };
+    float capacity(int i){
+        float a:=12.5;
+        return a;
     };
 };
-int g(int z){
-    z:=1;
-    return z;
+
+
+int x:=0;
+char c:='d';
+char s[2][2];
+string v[5];
+bool ok;
+
+int g(int y){
+    y:=2;
+    int z:=1;
+    for(int i:=0;i<z;i:=i+1){
+        z:=z+1;
+    }
+    return y;
 }
-new hello h;
-h.f(a);
+
 begin_progr
-a:=1;
-new hello j;
-clasa:=new hello;
-h.c:=1;
-a:=a+h.c+1;
-j.c:=h.c;
+
+x:=12/5+4*2-(-2+5);
+
+s[0][1]:='a';
+s[1][1]:=c;
+if(x==7){
+    char c:='z';
+    if(2+4<=8){
+        x:=x+1;
+    }
+    else{
+        x:=x-2;
+    }
+    s[0][0]:=c;
+}
+
+v[3]:="lfac";
+
+ok:=!((2+3)<5);
+
+while(true){
+    ok:=false;
+}
+
+int ex:=-5+g(2)-g(x);
+
+car1:=new car;
+car1.price:=1500;
+car1.isNew:=true;
+float w:=car1.capacity(x)+4.1;
+
+eval(2.5*w-car1.capacity(2)+0.2);
+typeOf(car1.consumption(1));
+
 end_progr

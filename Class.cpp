@@ -4,7 +4,7 @@ IdInfo *Object::getField(const char *name)
     for (IdInfo &id : fields)
     {
         if (id.name == name)
-        {
+        { 
             return &id;
         }
     }
@@ -209,8 +209,8 @@ void ObjectTable::printObjects()
                     fs<<id.value.cVal<<endl;
                 }
                 else if(id.type == "bool"){
-                    cout<<id.value.bVal<<endl;
-                    fs<<id.value.bVal<<endl;
+                    cout<<boolalpha<<id.value.bVal<<noboolalpha<<endl;
+                    fs<<boolalpha<<id.value.bVal<<noboolalpha<<endl;
                 }
                 else if(id.type == "string"){
                     cout<<id.value.sVal<<endl;
