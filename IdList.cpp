@@ -10,7 +10,7 @@ int IdList::addVar(const char *vtype, const char *vname, int scopeId, bool visAr
     IdInfo*var = new struct IdInfo;
     var->type = string(vtype);
     var->name = string(vname);
-    var->scopeId = scopeId;
+    var->scopeId = scopeId; 
     var->isArr = visArr;
     var->isConst = constness;
 

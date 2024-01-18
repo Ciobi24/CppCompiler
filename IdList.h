@@ -6,7 +6,7 @@
 #include <vector>
 #include <string>
 #include <string.h>
-#include <algorithm>
+#include <algorithm> 
 #include "Node.h"
 
 using namespace std;

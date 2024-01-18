@@ -1,6 +1,7 @@
 class car{
     int price;
     bool isNew;
+    int colors[2];
     int consumption(int p){
         int o:=2+3-4;
         return 0;

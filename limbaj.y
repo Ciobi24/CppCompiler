@@ -1344,11 +1344,12 @@ var_class_decl: TYPE ID {
                          field.isArr=true;
                          field.isConst=false;
                          field.scopeId=currScope;
-                         //initialize array,array size
+                         reverse(dimensionContainer.begin(), dimensionContainer.end());
                          field.dimensions=dimensionContainer;
                          fields.push_back(field);
-                         dimensionContainer.clear();
-                    }
+
+                    }                        
+                     dimensionContainer.clear();
                }
           | objects
           | methods
